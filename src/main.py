@@ -21,6 +21,7 @@ from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 import pyjokes
 import shutil
 from send2trash import send2trash
+from client import ask_ai
 from dotenv import load_dotenv
 load_dotenv()
 
@@ -342,7 +343,20 @@ def processCommand(c):
             
     else:
         #let go to it on openai
-        pass
+        speak("Let me think about that")
+        answer = ask_ai(c)
+        
+        if answer:
+            print("Jarvis:", answer)
+            speak(answer)
+            log_action(f"OpenAI response for: {c}")
+        else:
+            speak("I will search this on Google")
+            webbrowser.open(
+            f"https://www.google.com/search?q={c.replace(' ', '+')}"
+            )
+            log_action(f"Search fallback used: {c}")
+            
             
     
     
