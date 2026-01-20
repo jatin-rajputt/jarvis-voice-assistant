@@ -62,6 +62,7 @@ Create a file named .env in the project root.
 Add your API key:
 
 OPENAI_API_KEY=sk-your_api_key_here
+
 NEWS_API_KEY=your_mediastack_api_key
 
 
