@@ -29,16 +29,25 @@ Automatic Google Search fallback (no API required)
 
 📁 Project Structure
 majorproject/
+
 ├── src/
+
 │   ├── main.py
+
 │   ├── musicLibrary.py
-│   └── api/
-│       └── openai_client.py
+
+│   └── _client.py
+
 ├── tests/
+
 │   └── test_openai.py
+
 ├── .env
+
 ├── .gitignore
+
 ├── requirements.txt
+
 └── README.md
 
 🔑 API Key Setup (Optional)
