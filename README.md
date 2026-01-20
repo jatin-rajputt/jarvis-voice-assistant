@@ -1,7 +1,6 @@
 Jarvis Voice Assistant
 
 Author: Jatin
-Project Type: Major Project
 
 Jarvis is a secure, voice-controlled desktop assistant built with Python.
 It can automate system tasks, manage files, fetch news, control audio, and respond intelligently using AI when available.
