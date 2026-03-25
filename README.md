@@ -28,28 +28,19 @@ AI-powered responses (optional)
 Automatic Google Search fallback (no API required)
 
 📁 Project Structure
+```
 majorproject/
-
 ├── src/
-
 │   ├── main.py
-
 │   ├── musicLibrary.py
-
 │   └── _client.py
-
 ├── tests/
-
 │   └── test_openai.py
-
 ├── .env
-
 ├── .gitignore
-
 ├── requirements.txt
-
 └── README.md
-
+```
 🔑 API Key Setup (Optional)
 
 Jarvis supports AI responses using the OpenAI API.
