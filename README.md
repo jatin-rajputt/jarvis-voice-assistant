@@ -1,11 +1,11 @@
-Jarvis Voice Assistant
+#Jarvis Voice Assistant
 
 Author: Jatin
 
 Jarvis is a secure, voice-controlled desktop assistant built with Python.
 It can automate system tasks, manage files, fetch news, control audio, and respond intelligently using AI when available.
 
-✨ Features
+##✨ Features
 
 Voice activation (Jarvis)
 
@@ -27,7 +27,7 @@ AI-powered responses (optional)
 
 Automatic Google Search fallback (no API required)
 
-📁 Project Structure
+##📁 Project Structure
 ```
 majorproject/
 ├── src/
@@ -41,7 +41,7 @@ majorproject/
 ├── requirements.txt
 └── README.md
 ```
-🔑 API Key Setup (Optional)
+##🔑 API Key Setup (Optional)
 
 Jarvis supports AI responses using the OpenAI API.
 If you do not set an API key, Jarvis will automatically fall back to Google Search.
@@ -91,20 +91,24 @@ OpenAI API available → AI response
 
 No API key → Google Search fallback
 
-▶️ How to Run the Project
+##▶️ How to Run the Project
 Step 1: Create Virtual Environment
+```
 python -m venv .venv
-
+```
 Step 2: Activate Virtual Environment
+```
 .venv\Scripts\Activate.ps1
-
+```
 Step 3: Install Dependencies
+```
 pip install -r requirements.txt
-
+```
 Step 4: Run Jarvis
+```
 python src/main.py
-
-🔐 Security Features
+```
+###🔐 Security Features
 
 PIN-protected system commands
 
