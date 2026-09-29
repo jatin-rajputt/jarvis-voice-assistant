@@ -1,0 +1,160 @@
+================================================================================
+         JARVIS VOICE ASSISTANT - O7 SERVICES OFFICIAL AI WORKSHOP EDITION
+================================================================================
+Organization: O7 Services (O7 Services IT Company & Training Institute)
+Tagline: Master In-Demand IT Skills with Guaranteed Placement Support
+Established / Founded: September 5, 2015
+Headquarters: Jalandhar, Punjab, India
+Contact Phone: +91 84373 65007
+Contact Email: enquiry@o7services.com
+Company Website: https://o7services.com/
+Event: Artificial Intelligence Workshop
+School Venue: Birla Open Minds International School (BOMIS), Hoshiarpur
+Director: S. Kulwant Singh Kohar
+Location: Village Lohar Kangana, P.O. Nainowal Jattan, Tanda Road, Hoshiarpur, Punjab
+
+Default Voice Security PIN: 1234
+================================================================================
+
+1. O7 SERVICES COMPANY & AI WORKSHOP VOICE COMMANDS
+--------------------------------------------------------------------------------
+• "welcome workshop" / "start workshop" / "welcome presentation" : 
+   -> Speaks a high-tech formal welcome speech to students, Director Sardar Kulwant Singh Kohar, 
+      Principal, and teachers introducing O7 Services AI Workshop and JARVIS capabilities.
+
+• "about o7 services" / "company info" / "who is o7" :
+   -> Speaks official company overview of O7 Services (Established Sept 5, 2015 in Jalandhar), 
+      ISO-certified training, 100% placement support, and live project engineer trainers.
+
+• "o7 courses" / "what courses" / "training programs" :
+   -> Lists O7 Services training courses: Artificial Intelligence, Data Science, Python, 
+      Full Stack Web Development, Cyber Security, Cloud Computing, Android, and UI/UX.
+
+• "placement" / "o7 placement" / "placement support" :
+   -> Speaks about O7 Services 100% placement assistance and career guidance.
+
+• "contact o7" / "o7 phone" / "o7 email" :
+   -> Speaks official phone (+91 84373 65007), email (enquiry@o7services.com), and website.
+
+• "open o7 website" :
+   -> Opens official O7 Services website (o7services.com) in browser.
+
+• "workshop info" / "why are we here" :
+   -> Explains the purpose of the O7 Services AI Workshop at Birla Open Minds Hoshiarpur.
+
+
+2. BIRLA OPEN MINDS SCHOOL COMMANDS
+--------------------------------------------------------------------------------
+• "tell me about my school" / "birla open minds" / "about school" :
+   -> Speaks complete presentation of BOMIS Hoshiarpur: Nurturing India's Tomorrow, 
+      the 4 C's philosophy (Care, Cooperation, Collaboration, Courtesy), and 21st-century leadership.
+
+• "who is director" / "director message" / "kulwant singh" :
+   -> Speaks about Director Sardar Kulwant Singh Kohar and his vision for holistic education.
+
+• "school location" / "where is school" :
+   -> Speaks the exact address in Hoshiarpur, Punjab.
+
+• "open school website" :
+   -> Opens official school website (birlaopenminds.com/k12/Punjab/hoshiarpur/) in browser.
+
+
+3. SYSTEM APPLICATIONS & WEB LAUNCHERS
+--------------------------------------------------------------------------------
+• "open google"         : Opens Google homepage in web browser.
+• "open youtube"        : Opens YouTube in web browser.
+• "open facebook"       : Opens Facebook in web browser.
+• "open linkedin"       : Opens LinkedIn in web browser.
+• "open github"         : Opens GitHub in web browser.
+• "open notepad"        : Opens Windows Notepad application.
+• "open calculator"     : Opens Windows Calculator application.
+• "open command prompt" : Opens Windows Command Prompt (cmd).
+• "open powershell"     : Opens Windows PowerShell.
+• "open task manager"   : Opens Windows Task Manager.
+
+
+4. SYSTEM TELEMETRY & PERFORMANCE MONITORING
+--------------------------------------------------------------------------------
+• "time"                : Speaks the current local time.
+• "date"                : Speaks today's full date.
+• "battery"             : Speaks battery percentage & charging status.
+• "cpu usage" / "cpu"   : Speaks current CPU load percentage.
+• "ram usage" / "memory": Speaks current RAM usage percentage.
+
+
+5. MASTER VOLUME CONTROLS
+--------------------------------------------------------------------------------
+• "volume up"           : Sets system volume to 80%.
+• "volume down"         : Sets system volume to 30%.
+• "mute"                : Mutes system audio completely (0%).
+
+
+6. MUSIC PLAYBACK & YOUTUBE SEARCH
+--------------------------------------------------------------------------------
+• "play <song name>"    : Plays specific song from preset library OR 
+                          automatically searches and plays top YouTube result.
+                          Examples: "play tu jdo ana", "play arjun", "play Believer"
+
+
+7. NEWS & HEADLINES
+--------------------------------------------------------------------------------
+• "news"                : Reads out today's top 5 news headlines 
+                          (Uses free Google News RSS feed, no API key needed).
+
+
+8. ENTERTAINMENT & HUMOR
+--------------------------------------------------------------------------------
+• "joke" / "tell joke"  : Reads a random tech/neutral joke.
+
+
+9. SYSTEM POWER MANAGEMENT (SECURITY PIN PROTECTED)
+--------------------------------------------------------------------------------
+• "shutdown"            : Asks for Security PIN (1234), then shuts down system.
+• "restart"             : Asks for Security PIN (1234), then restarts system.
+• "sleep"               : Asks for Security PIN (1234), then puts system to sleep.
+
+
+10. FILE & FOLDER OPERATIONS
+--------------------------------------------------------------------------------
+• "open desktop"        : Opens Desktop directory in File Explorer.
+• "open documents"      : Opens Documents directory in File Explorer.
+• "open downloads"      : Opens Downloads directory in File Explorer.
+• "create folder"       : Asks for folder name via voice, creates it on Desktop.
+• "create file"         : Asks for file name via voice, creates .txt file on Desktop.
+• "list files"          : Reads names of files inside Documents folder.
+• "delete folder"       : Asks for folder name, verifies Security PIN, 
+                          moves folder safely to Recycle Bin.
+• "delete file"         : Asks for file name, verifies Security PIN, 
+                          moves file safely to Recycle Bin.
+
+
+11. FREE AI KNOWLEDGE BASE & WEB SEARCH (NO OPENAI KEY NEEDED)
+--------------------------------------------------------------------------------
+• "who is <person>"     : Searches Wikipedia/DuckDuckGo, speaks concise bio.
+• "what is <topic>"     : Searches Wikipedia/DuckDuckGo, speaks concise definition.
+• "tell me about <q>"   : Fetches quick answer summary aloud.
+• "search <query>"      : Performs Google search directly in web browser.
+• General Questions     : Tries free knowledge base first; if no direct answer is 
+                          found, automatically launches Google search.
+
+
+12. ASSISTANT CONTROL & REPETITION
+--------------------------------------------------------------------------------
+• "repeat"              : Repeats the last executed voice command.
+• "who are you"         : Speaks JARVIS identity response (O7 Services AI Assistant).
+• "who created you"     : Speaks author information (Jatin from O7 Services).
+• "what can you do"     : Summarizes JARVIS capabilities aloud.
+• "exit jarvis" / "exit": Safely shuts down JARVIS interface.
+
+
+13. FUTURISTIC ARC REACTOR GUI FEATURES
+--------------------------------------------------------------------------------
+• Header Title: "⚡ J.A.R.V.I.S // O7 SERVICES AI WORKSHOP"
+• Vector-painted animated Ironman Arc Reactor Core with rotating tech rings.
+• Dynamic state color shifts (Cyan = Standby, Green = Listening, Gold = Processing, Red = PIN Check).
+• Animated Sound Waveform Equalizer.
+• Organization & Venue Telemetry Cards: O7 Services & BOMIS Hoshiarpur.
+• Quick Action Buttons including "🏫 SCHOOL DEMO".
+• Dual Input: Voice Activate button + Text command bar with Send button.
+
+================================================================================
