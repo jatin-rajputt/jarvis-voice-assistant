@@ -276,8 +276,16 @@ class CommandExecThread(QThread):
         self.command = command
 
     def run(self):
-        res = self.jarvis.process_command(self.command)
-        self.signal_finished.emit(res or "DONE")
+        try:
+            res = self.jarvis.process_command(self.command)
+            self.signal_finished.emit(res or "DONE")
+        except Exception as e:
+            print(f"[Command Execution Exception Suppressed] {e}")
+            try:
+                self.jarvis.speak("An unexpected error occurred while processing your request.")
+            except Exception:
+                pass
+            self.signal_finished.emit("ERROR")
 
 
 class JarvisMainWindow(QMainWindow):

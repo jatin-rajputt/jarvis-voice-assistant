@@ -630,7 +630,12 @@ class JarvisCore:
 
         else:
             self.speak("Analyzing database...")
-            answer = ask_ai(raw_command)
+            try:
+                answer = ask_ai(raw_command)
+            except Exception as e:
+                print(f"[AI Search Error Suppressed] {e}")
+                answer = None
+
             if answer:
                 self.speak(answer)
             else:
