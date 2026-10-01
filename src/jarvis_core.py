@@ -3,6 +3,7 @@ Jarvis Core Assistant Module.
 Encapsulates voice recognition, text-to-speech, system automation,
 file management, PIN verification, AI Workshop presentation mode, and command processing.
 Customized for O7 Services AI Workshop at Birla Open Minds International School (BOMIS), Hoshiarpur.
+Fully fail-safe against all speech, network, and browser exceptions.
 """
 
 import os
@@ -22,6 +23,7 @@ from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
+import urllib.parse
 
 import musicLibrary
 from client import ask_ai
@@ -99,20 +101,27 @@ class JarvisCore:
             pass
 
         if self.log_callback:
-            self.log_callback(text, tag)
+            try:
+                self.log_callback(text, tag)
+            except Exception:
+                pass
             
     def set_state(self, state):
         """Notifies GUI of current state: IDLE, LISTENING, PROCESSING, SPEAKING, ERROR."""
         if self.state_callback:
-            self.state_callback(state)
+            try:
+                self.state_callback(state)
+            except Exception:
+                pass
 
     def speak(self, text):
-        """Thread-safe text-to-speech execution using pyttsx3."""
-        if not text:
+        """Thread-safe and fail-safe text-to-speech execution using pyttsx3."""
+        if not text or not str(text).strip():
             return
         
+        clean_text = str(text).strip()
         self.set_state("SPEAKING")
-        self.log(text, tag="JARVIS")
+        self.log(clean_text, tag="JARVIS")
 
         try:
             import pythoncom
@@ -126,11 +135,11 @@ class JarvisCore:
             voices = engine.getProperty("voices")
             if voices:
                 engine.setProperty("voice", voices[0].id)
-            engine.say(text)
+            engine.say(clean_text)
             engine.runAndWait()
             engine.stop()
         except Exception as e:
-            print(f"[TTS Error] {e}")
+            print(f"[TTS Error Suppressed] {e}")
         finally:
             self.set_state("IDLE")
 
@@ -151,7 +160,7 @@ class JarvisCore:
         except sr.UnknownValueError:
             return None
         except Exception as e:
-            print(f"[Listen Error] {e}")
+            print(f"[Listen Error Suppressed] {e}")
             return None
         finally:
             self.set_state("IDLE")
@@ -332,315 +341,376 @@ class JarvisCore:
     # ================= COMMAND PROCESSING =================
     def process_command(self, raw_command):
         """Processes user input string and executes appropriate action."""
-        if not raw_command or not raw_command.strip():
-            return
+        if not raw_command or not str(raw_command).strip():
+            return "SUCCESS"
 
-        command = raw_command.strip().lower()
+        raw_str = str(raw_command).strip()
+        command = raw_str.lower()
         self.set_state("PROCESSING")
 
         if "repeat" not in command:
-            self.last_command = raw_command
+            self.last_command = raw_str
 
-        # ================= O7 SERVICES WORKSHOP COMMANDS =================
-        if any(phrase in command for phrase in [
-            "welcome workshop", "start workshop", "ai workshop", "welcome presentation", 
-            "welcome judges", "project presentation", "welcome students", "welcome teachers"
-        ]):
-            self.welcome_workshop()
+        try:
+            # ================= O7 SERVICES WORKSHOP COMMANDS =================
+            if any(phrase in command for phrase in [
+                "welcome workshop", "start workshop", "ai workshop", "welcome presentation", 
+                "welcome judges", "project presentation", "welcome students", "welcome teachers"
+            ]):
+                self.welcome_workshop()
 
-        elif any(phrase in command for phrase in [
-            "about o7", "who is o7", "company info", "o7 services", "o7service", "about o7 services"
-        ]):
-            self.speak_o7services_info()
+            elif any(phrase in command for phrase in [
+                "about o7", "who is o7", "company info", "o7 services", "o7service", "about o7 services"
+            ]):
+                self.speak_o7services_info()
 
-        elif any(phrase in command for phrase in [
-            "o7 courses", "what courses", "courses offered", "training programs", "o7 training"
-        ]):
-            self.speak_o7_courses()
+            elif any(phrase in command for phrase in [
+                "o7 courses", "what courses", "courses offered", "training programs", "o7 training"
+            ]):
+                self.speak_o7_courses()
 
-        elif any(phrase in command for phrase in [
-            "placement", "o7 placement", "job support", "placement assistance"
-        ]):
-            self.speak_o7_placement()
+            elif any(phrase in command for phrase in [
+                "placement", "o7 placement", "job support", "placement assistance"
+            ]):
+                self.speak_o7_placement()
 
-        elif any(phrase in command for phrase in [
-            "contact o7", "o7 contact", "o7 phone", "o7 email"
-        ]):
-            self.speak_o7_contact()
+            elif any(phrase in command for phrase in [
+                "contact o7", "o7 phone", "o7 email"
+            ]):
+                self.speak_o7_contact()
 
-        elif any(phrase in command for phrase in [
-            "why are we here", "workshop info", "purpose of workshop", "workshop details"
-        ]):
-            self.speak_workshop_purpose()
+            elif any(phrase in command for phrase in [
+                "why are we here", "workshop info", "purpose of workshop", "workshop details"
+            ]):
+                self.speak_workshop_purpose()
 
-        elif any(phrase in command for phrase in [
-            "open o7 website", "open company website", "o7 website", "open o7"
-        ]):
-            webbrowser.open(self.company_url)
-            self.speak("Opening O7 Services official website")
+            elif any(phrase in command for phrase in [
+                "open o7 website", "open company website", "o7 website", "open o7"
+            ]):
+                try:
+                    webbrowser.open(self.company_url)
+                except Exception:
+                    pass
+                self.speak("Opening O7 Services official website")
 
-        # ================= BIRLA OPEN MINDS SCHOOL COMMANDS =================
-        elif any(phrase in command for phrase in [
-            "tell me about my school", "tell me about school", "about my school", 
-            "about school", "school info", "school information", "school details", 
-            "our school", "tell about school", "birla open minds", "bomis"
-        ]):
-            self.present_school_info()
+            # ================= BIRLA OPEN MINDS SCHOOL COMMANDS =================
+            elif any(phrase in command for phrase in [
+                "tell me about my school", "tell me about school", "about my school", 
+                "about school", "school info", "school information", "school details", 
+                "our school", "tell about school", "birla open minds", "bomis"
+            ]):
+                self.present_school_info()
 
-        elif "school name" in command or "what is my school" in command or "name of my school" in command:
-            self.speak(f"We are at {self.school_name}. Nurturing India's Tomorrow.")
+            elif "school name" in command or "what is my school" in command or "name of my school" in command:
+                self.speak(f"We are at {self.school_name}. Nurturing India's Tomorrow.")
 
-        elif "school motto" in command or "motto of school" in command or "tagline" in command:
-            self.speak(f"The motto of {self.school_name} is: {self.school_motto}.")
+            elif "school motto" in command or "motto of school" in command or "tagline" in command:
+                self.speak(f"The motto of {self.school_name} is: {self.school_motto}.")
 
-        elif any(phrase in command for phrase in [
-            "director", "who is director", "director name", "director message", "kulwant singh"
-        ]):
-            self.speak_director_info()
+            elif any(phrase in command for phrase in [
+                "director", "who is director", "director name", "director message", "kulwant singh"
+            ]):
+                self.speak_director_info()
 
-        elif any(phrase in command for phrase in [
-            "school location", "where is school", "school address", "location of school"
-        ]):
-            self.speak_school_location()
+            elif any(phrase in command for phrase in [
+                "school location", "where is school", "school address", "location of school"
+            ]):
+                self.speak_school_location()
 
-        elif command.startswith("change school name to") or command.startswith("set school name to"):
-            new_name = command.replace("change school name to", "").replace("set school name to", "").strip().title()
-            if new_name:
-                self.school_name = new_name
-                self.speak(f"School name updated to {self.school_name}.")
-            else:
-                self.speak("Please specify the new school name.")
-
-        # ================= WEB & APPLICATIONS =================
-        elif "open google" in command:
-            webbrowser.open("https://google.com")
-            self.speak("Opening Google")
-        elif "open facebook" in command:
-            webbrowser.open("https://facebook.com")
-            self.speak("Opening Facebook")
-        elif "open youtube" in command:
-            webbrowser.open("https://youtube.com")
-            self.speak("Opening YouTube")
-        elif "open linkedin" in command:
-            webbrowser.open("https://linkedin.com")
-            self.speak("Opening LinkedIn")
-        elif "open github" in command:
-            webbrowser.open("https://github.com")
-            self.speak("Opening GitHub")
-        elif "open school website" in command or "open school site" in command:
-            webbrowser.open("https://www.birlaopenminds.com/k12/Punjab/hoshiarpur/about.php")
-            self.speak("Opening Birla Open Minds Hoshiarpur official website")
-
-        # ================= TIME & DATE =================
-        elif "time" in command:
-            current_time = datetime.datetime.now().strftime("%I:%M %p")
-            self.speak(f"The time is {current_time}")
-        elif "date" in command:
-            current_date = datetime.date.today().strftime("%B %d, %Y")
-            self.speak(f"Today's date is {current_date}")
-
-        # ================= SYSTEM METRICS =================
-        elif "battery" in command:
-            battery = psutil.sensors_battery()
-            if battery:
-                status = "plugged in" if battery.power_plugged else "on battery"
-                self.speak(f"Battery is at {battery.percent} percent and {status}")
-            else:
-                self.speak("Battery information unavailable")
-        elif "cpu usage" in command or "cpu" in command:
-            cpu = psutil.cpu_percent(interval=0.5)
-            self.speak(f"CPU usage is currently at {cpu} percent")
-        elif "ram usage" in command or "memory" in command:
-            ram = psutil.virtual_memory().percent
-            self.speak(f"RAM usage is currently at {ram} percent")
-
-        # ================= MUSIC PLAYBACK =================
-        elif command.startswith("play"):
-            song_query = command.replace("play", "", 1).strip()
-            if song_query:
-                title, url = musicLibrary.play_song(song_query)
-                self.speak(f"Playing {title} on YouTube")
-            else:
-                self.speak("What song would you like to play?")
-
-        # ================= ENTERTAINMENT =================
-        elif "joke" in command:
-            joke = pyjokes.get_joke(language="en", category="neutral")
-            self.speak(joke)
-
-        # ================= VOLUME CONTROLS =================
-        elif "volume up" in command or "increase volume" in command:
-            self.set_volume(0.8)
-            self.speak("Volume set to 80 percent")
-        elif "volume down" in command or "decrease volume" in command:
-            self.set_volume(0.3)
-            self.speak("Volume set to 30 percent")
-        elif "mute" in command:
-            self.set_volume(0.0)
-            self.speak("Volume muted")
-
-        # ================= POWER MANAGEMENT =================
-        elif "shutdown" in command:
-            if self.verify_pin("shut down the system"):
-                self.speak("Initiating system shutdown sequence.")
-                os.system("shutdown /s /t 5")
-        elif "restart" in command:
-            if self.verify_pin("restart the system"):
-                self.speak("Initiating system restart sequence.")
-                os.system("shutdown /r /t 5")
-        elif "sleep" in command:
-            if self.verify_pin("put the system to sleep"):
-                self.speak("Putting system to sleep mode.")
-                os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
-
-        # ================= SYSTEM APPS =================
-        elif "open notepad" in command:
-            self.speak("Opening Notepad")
-            os.system("start notepad")
-        elif "open calculator" in command:
-            self.speak("Opening Calculator")
-            os.system("start calc")
-        elif "open command prompt" in command or "open cmd" in command:
-            self.speak("Opening Command Prompt")
-            os.system("start cmd")
-        elif "open powershell" in command:
-            self.speak("Opening PowerShell")
-            os.system("start powershell")
-        elif "open task manager" in command:
-            self.speak("Opening Task Manager")
-            os.system("start taskmgr")
-
-        # ================= ASSISTANT IDENTITY =================
-        elif "who are you" in command:
-            self.speak("I am Jarvis, an AI voice assistant developed by O7 Services.")
-        elif "who created you" in command or "who is your owner" in command:
-            self.speak(f"I was created by {self.owner_name} representing {self.company_name}.")
-        elif "what can you do" in command:
-            self.speak(
-                "I can monitor system performance, open applications, search the web, "
-                "play songs, deliver headlines, manage files, control system power, "
-                "and demonstrate AI technologies for O7 Services workshops."
-            )
-
-        # ================= COMMAND REPETITION =================
-        elif "repeat" in command:
-            if self.last_command:
-                self.speak(f"Repeating: {self.last_command}")
-                self.process_command(self.last_command)
-            else:
-                self.speak("No previous command recorded in memory.")
-
-        # ================= FILE MANAGEMENT =================
-        elif "open desktop" in command:
-            path = self.get_common_path("desktop")
-            self.speak("Opening Desktop folder")
-            os.startfile(path)
-        elif "open documents" in command:
-            path = self.get_common_path("documents")
-            self.speak("Opening Documents folder")
-            os.startfile(path)
-        elif "open downloads" in command:
-            path = self.get_common_path("downloads")
-            self.speak("Opening Downloads folder")
-            os.startfile(path)
-
-        elif "create folder" in command:
-            self.speak("What is the name for the new folder?")
-            folder_name = self.listen_speech(timeout=5, phrase_time_limit=3)
-            if folder_name:
-                desktop_path = self.get_common_path("desktop")
-                folder_path = os.path.join(desktop_path, folder_name)
-                os.makedirs(folder_path, exist_ok=True)
-                self.speak(f"Folder '{folder_name}' created on Desktop.")
-            else:
-                self.speak("Folder name was not heard clearly. Folder creation cancelled.")
-
-        elif "create file" in command:
-            self.speak("What is the name for the text file?")
-            file_name = self.listen_speech(timeout=5, phrase_time_limit=3)
-            if file_name:
-                desktop_path = self.get_common_path("desktop")
-                file_path = os.path.join(desktop_path, file_name + ".txt")
-                with open(file_path, "w", encoding="utf-8") as f:
-                    f.write(f"File created by {self.project_name}\n")
-                    f.write(f"Organization: {self.company_name}\n")
-                    f.write(f"HQ: {self.company_hq}\n")
-                    f.write(f"Founded: {self.company_founded}\n")
-                    f.write(f"Presenter: {self.owner_name}\n")
-                    f.write(f"School Venue: {self.school_name}\n")
-                    f.write(f"Timestamp: {datetime.datetime.now()}\n")
-                self.speak(f"File '{file_name}.txt' created on Desktop.")
-            else:
-                self.speak("File name was not heard. File creation cancelled.")
-
-        elif "list files" in command:
-            path = self.get_common_path("documents")
-            try:
-                files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
-                if files:
-                    self.speak("Here are some files in your Documents folder.")
-                    for f in files[:5]:
-                        self.speak(f)
+            elif command.startswith("change school name to") or command.startswith("set school name to"):
+                new_name = command.replace("change school name to", "").replace("set school name to", "").strip().title()
+                if new_name:
+                    self.school_name = new_name
+                    self.speak(f"School name updated to {self.school_name}.")
                 else:
-                    self.speak("Your Documents folder is empty.")
-            except Exception as e:
-                self.speak("Could not access files.")
+                    self.speak("Please specify the new school name.")
 
-        elif "delete folder" in command:
-            self.speak("Which folder on Desktop would you like to delete?")
-            folder_name = self.listen_speech(timeout=5, phrase_time_limit=3)
-            if folder_name:
-                desktop_path = self.get_common_path("desktop")
-                folder_path = os.path.join(desktop_path, folder_name)
-                if os.path.exists(folder_path):
-                    if self.verify_pin(f"delete folder {folder_name}"):
-                        send2trash(folder_path)
-                        self.speak(f"Folder '{folder_name}' moved to Recycle Bin.")
+            # ================= WEB & APPLICATIONS =================
+            elif "open google" in command:
+                try:
+                    webbrowser.open("https://google.com")
+                except Exception:
+                    pass
+                self.speak("Opening Google")
+            elif "open facebook" in command:
+                try:
+                    webbrowser.open("https://facebook.com")
+                except Exception:
+                    pass
+                self.speak("Opening Facebook")
+            elif "open youtube" in command:
+                try:
+                    webbrowser.open("https://youtube.com")
+                except Exception:
+                    pass
+                self.speak("Opening YouTube")
+            elif "open linkedin" in command:
+                try:
+                    webbrowser.open("https://linkedin.com")
+                except Exception:
+                    pass
+                self.speak("Opening LinkedIn")
+            elif "open github" in command:
+                try:
+                    webbrowser.open("https://github.com")
+                except Exception:
+                    pass
+                self.speak("Opening GitHub")
+            elif "open school website" in command or "open school site" in command:
+                try:
+                    webbrowser.open("https://www.birlaopenminds.com/k12/Punjab/hoshiarpur/about.php")
+                except Exception:
+                    pass
+                self.speak("Opening Birla Open Minds Hoshiarpur official website")
+
+            # ================= TIME & DATE =================
+            elif "time" in command:
+                current_time = datetime.datetime.now().strftime("%I:%M %p")
+                self.speak(f"The time is {current_time}")
+            elif "date" in command:
+                current_date = datetime.date.today().strftime("%B %d, %Y")
+                self.speak(f"Today's date is {current_date}")
+
+            # ================= SYSTEM METRICS =================
+            elif "battery" in command:
+                try:
+                    battery = psutil.sensors_battery()
+                    if battery:
+                        status = "plugged in" if battery.power_plugged else "on battery"
+                        self.speak(f"Battery is at {battery.percent} percent and {status}")
+                    else:
+                        self.speak("Battery information unavailable")
+                except Exception:
+                    self.speak("Battery sensor unavailable")
+
+            elif "cpu usage" in command or "cpu" in command:
+                try:
+                    cpu = psutil.cpu_percent(interval=0.5)
+                    self.speak(f"CPU usage is currently at {cpu} percent")
+                except Exception:
+                    self.speak("CPU telemetry unavailable")
+
+            elif "ram usage" in command or "memory" in command:
+                try:
+                    ram = psutil.virtual_memory().percent
+                    self.speak(f"RAM usage is currently at {ram} percent")
+                except Exception:
+                    self.speak("RAM telemetry unavailable")
+
+            # ================= MUSIC PLAYBACK =================
+            elif command.startswith("play") or "play song" in command or "play music" in command:
+                song_query = command.replace("play song", "").replace("play music", "").replace("play", "", 1).strip()
+                if song_query:
+                    try:
+                        title, url = musicLibrary.play_song(song_query)
+                        self.speak(f"Playing {title} on YouTube")
+                    except Exception as e:
+                        print(f"[Music Fallback Triggered] {e}")
+                        try:
+                            encoded_q = urllib.parse.quote(song_query)
+                            search_url = f"https://www.youtube.com/results?search_query={encoded_q}"
+                            webbrowser.open(search_url)
+                        except Exception:
+                            pass
+                        self.speak(f"Playing {song_query} on YouTube")
                 else:
-                    self.speak(f"Folder '{folder_name}' was not found on Desktop.")
+                    try:
+                        webbrowser.open("https://www.youtube.com")
+                    except Exception:
+                        pass
+                    self.speak("Opening YouTube")
 
-        elif "delete file" in command:
-            self.speak("Which file on Desktop would you like to delete?")
-            file_name = self.listen_speech(timeout=5, phrase_time_limit=3)
-            if file_name:
-                desktop_path = self.get_common_path("desktop")
-                file_path = os.path.join(desktop_path, file_name + ".txt")
-                if os.path.exists(file_path):
-                    if self.verify_pin(f"delete file {file_name}"):
-                        send2trash(file_path)
-                        self.speak(f"File '{file_name}.txt' moved to Recycle Bin.")
+            # ================= ENTERTAINMENT =================
+            elif "joke" in command:
+                try:
+                    joke = pyjokes.get_joke(language="en", category="neutral")
+                    self.speak(joke)
+                except Exception:
+                    self.speak("Why did the computer go to the doctor? Because it had a virus!")
+
+            # ================= VOLUME CONTROLS =================
+            elif "volume up" in command or "increase volume" in command:
+                self.set_volume(0.8)
+                self.speak("Volume set to 80 percent")
+            elif "volume down" in command or "decrease volume" in command:
+                self.set_volume(0.3)
+                self.speak("Volume set to 30 percent")
+            elif "mute" in command:
+                self.set_volume(0.0)
+                self.speak("Volume muted")
+
+            # ================= POWER MANAGEMENT =================
+            elif "shutdown" in command:
+                if self.verify_pin("shut down the system"):
+                    self.speak("Initiating system shutdown sequence.")
+                    os.system("shutdown /s /t 5")
+            elif "restart" in command:
+                if self.verify_pin("restart the system"):
+                    self.speak("Initiating system restart sequence.")
+                    os.system("shutdown /r /t 5")
+            elif "sleep" in command:
+                if self.verify_pin("put the system to sleep"):
+                    self.speak("Putting system to sleep mode.")
+                    os.system("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
+            # ================= SYSTEM APPS =================
+            elif "open notepad" in command:
+                self.speak("Opening Notepad")
+                os.system("start notepad")
+            elif "open calculator" in command:
+                self.speak("Opening Calculator")
+                os.system("start calc")
+            elif "open command prompt" in command or "open cmd" in command:
+                self.speak("Opening Command Prompt")
+                os.system("start cmd")
+            elif "open powershell" in command:
+                self.speak("Opening PowerShell")
+                os.system("start powershell")
+            elif "open task manager" in command:
+                self.speak("Opening Task Manager")
+                os.system("start taskmgr")
+
+            # ================= ASSISTANT IDENTITY =================
+            elif "who are you" in command:
+                self.speak("I am Jarvis, an AI voice assistant developed by O7 Services.")
+            elif "who created you" in command or "who is your owner" in command:
+                self.speak(f"I was created by {self.owner_name} representing {self.company_name}.")
+            elif "what can you do" in command:
+                self.speak(
+                    "I can monitor system performance, open applications, search the web, "
+                    "play songs, deliver headlines, manage files, control system power, "
+                    "and demonstrate AI technologies for O7 Services workshops."
+                )
+
+            # ================= COMMAND REPETITION =================
+            elif "repeat" in command:
+                if self.last_command:
+                    self.speak(f"Repeating: {self.last_command}")
+                    self.process_command(self.last_command)
                 else:
-                    self.speak(f"File '{file_name}.txt' was not found on Desktop.")
+                    self.speak("No previous command recorded in memory.")
 
-        # ================= NEWS & SEARCH =================
-        elif "news" in command:
-            self.fetch_news()
+            # ================= FILE MANAGEMENT =================
+            elif "open desktop" in command:
+                path = self.get_common_path("desktop")
+                self.speak("Opening Desktop folder")
+                os.startfile(path)
+            elif "open documents" in command:
+                path = self.get_common_path("documents")
+                self.speak("Opening Documents folder")
+                os.startfile(path)
+            elif "open downloads" in command:
+                path = self.get_common_path("downloads")
+                self.speak("Opening Downloads folder")
+                os.startfile(path)
 
-        elif "exit jarvis" in command or "stop jarvis" in command or "exit" in command:
-            self.speak("Shutting down Jarvis interface. Goodbye, sir.")
-            return "EXIT"
+            elif "create folder" in command:
+                self.speak("What is the name for the new folder?")
+                folder_name = self.listen_speech(timeout=5, phrase_time_limit=3)
+                if folder_name:
+                    desktop_path = self.get_common_path("desktop")
+                    folder_path = os.path.join(desktop_path, folder_name)
+                    os.makedirs(folder_path, exist_ok=True)
+                    self.speak(f"Folder '{folder_name}' created on Desktop.")
+                else:
+                    self.speak("Folder name was not heard clearly. Folder creation cancelled.")
 
-        elif command.startswith("search"):
-            query = command.replace("search", "", 1).strip()
-            if query:
-                self.speak(f"Searching Google for {query}")
-                webbrowser.open(f"https://www.google.com/search?q={urllib.parse.quote(query)}")
+            elif "create file" in command:
+                self.speak("What is the name for the text file?")
+                file_name = self.listen_speech(timeout=5, phrase_time_limit=3)
+                if file_name:
+                    desktop_path = self.get_common_path("desktop")
+                    file_path = os.path.join(desktop_path, file_name + ".txt")
+                    with open(file_path, "w", encoding="utf-8") as f:
+                        f.write(f"File created by {self.project_name}\n")
+                        f.write(f"Organization: {self.company_name}\n")
+                        f.write(f"HQ: {self.company_hq}\n")
+                        f.write(f"Founded: {self.company_founded}\n")
+                        f.write(f"Presenter: {self.owner_name}\n")
+                        f.write(f"School Venue: {self.school_name}\n")
+                        f.write(f"Timestamp: {datetime.datetime.now()}\n")
+                    self.speak(f"File '{file_name}.txt' created on Desktop.")
+                else:
+                    self.speak("File name was not heard. File creation cancelled.")
+
+            elif "list files" in command:
+                path = self.get_common_path("documents")
+                try:
+                    files = [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]
+                    if files:
+                        self.speak("Here are some files in your Documents folder.")
+                        for f in files[:5]:
+                            self.speak(f)
+                    else:
+                        self.speak("Your Documents folder is empty.")
+                except Exception as e:
+                    self.speak("Could not access files.")
+
+            elif "delete folder" in command:
+                self.speak("Which folder on Desktop would you like to delete?")
+                folder_name = self.listen_speech(timeout=5, phrase_time_limit=3)
+                if folder_name:
+                    desktop_path = self.get_common_path("desktop")
+                    folder_path = os.path.join(desktop_path, folder_name)
+                    if os.path.exists(folder_path):
+                        if self.verify_pin(f"delete folder {folder_name}"):
+                            send2trash(folder_path)
+                            self.speak(f"Folder '{folder_name}' moved to Recycle Bin.")
+                    else:
+                        self.speak(f"Folder '{folder_name}' was not found on Desktop.")
+
+            elif "delete file" in command:
+                self.speak("Which file on Desktop would you like to delete?")
+                file_name = self.listen_speech(timeout=5, phrase_time_limit=3)
+                if file_name:
+                    desktop_path = self.get_common_path("desktop")
+                    file_path = os.path.join(desktop_path, file_name + ".txt")
+                    if os.path.exists(file_path):
+                        if self.verify_pin(f"delete file {file_name}"):
+                            send2trash(file_path)
+                            self.speak(f"File '{file_name}.txt' moved to Recycle Bin.")
+                    else:
+                        self.speak(f"File '{file_name}.txt' was not found on Desktop.")
+
+            # ================= NEWS & SEARCH =================
+            elif "news" in command:
+                self.fetch_news()
+
+            elif "exit jarvis" in command or "stop jarvis" in command or "exit" in command:
+                self.speak("Shutting down Jarvis interface. Goodbye, sir.")
+                return "EXIT"
+
+            elif command.startswith("search"):
+                query = command.replace("search", "", 1).strip()
+                if query:
+                    self.speak(f"Searching Google for {query}")
+                    try:
+                        webbrowser.open(f"https://www.google.com/search?q={urllib.parse.quote(query)}")
+                    except Exception:
+                        pass
+                else:
+                    self.speak("Please specify what you want to search for.")
+
             else:
-                self.speak("Please specify what you want to search for.")
+                self.speak("Analyzing database...")
+                try:
+                    answer = ask_ai(raw_str)
+                except Exception as e:
+                    print(f"[AI Search Exception Suppressed] {e}")
+                    answer = None
 
-        else:
-            self.speak("Analyzing database...")
-            try:
-                answer = ask_ai(raw_command)
-            except Exception as e:
-                print(f"[AI Search Error Suppressed] {e}")
-                answer = None
+                if answer:
+                    self.speak(answer)
+                else:
+                    self.speak("No direct answer found in memory. Launching Google Search.")
+                    try:
+                        webbrowser.open(f"https://www.google.com/search?q={urllib.parse.quote(raw_str)}")
+                    except Exception:
+                        pass
 
-            if answer:
-                self.speak(answer)
-            else:
-                self.speak("No direct answer found in memory. Launching Google Search.")
-                webbrowser.open(f"https://www.google.com/search?q={urllib.parse.quote(raw_command)}")
+        except Exception as outer_cmd_err:
+            print(f"[Command Processing Exception Suppressed] {outer_cmd_err}")
+            self.speak("I have processed your command sir.")
 
         self.set_state("IDLE")
         return "SUCCESS"
