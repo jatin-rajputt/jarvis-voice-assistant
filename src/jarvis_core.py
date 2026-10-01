@@ -201,12 +201,9 @@ class JarvisCore:
             
             self.current_tts_engine = engine
 
-            for sentence in sentences:
-                if self.stop_speech_flag:
-                    break
-                if sentence and sentence.strip():
-                    engine.say(sentence.strip())
-                    engine.runAndWait()
+            if not self.stop_speech_flag:
+                engine.say(clean_text)
+                engine.runAndWait()
             
             engine.stop()
         except Exception as e:
