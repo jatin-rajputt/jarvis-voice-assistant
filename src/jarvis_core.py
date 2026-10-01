@@ -3,7 +3,7 @@ Jarvis Core Assistant Module.
 Encapsulates voice recognition, text-to-speech, system automation,
 file management, PIN verification, AI Workshop presentation mode, and command processing.
 Customized for O7 Services AI Workshop at Birla Open Minds International School (BOMIS), Hoshiarpur.
-Features sentence-level interruptible speech engine (Instant Stop Speaking on demand).
+Features sentence-level interruptible speech engine with automatic Unicode text sanitization.
 """
 
 import os
@@ -54,6 +54,41 @@ SCHOOL_PHILOSOPHY = "Care, Cooperation, Collaboration, and Courtesy (The 4 C's)"
 SCHOOL_DIRECTOR = "S. Kulwant Singh Kohar"
 SCHOOL_LOCATION = "Village Lohar Kangana, P.O. Nainowal Jattan, Tanda Road, Hoshiarpur, Punjab"
 SCHOOL_EMAIL = "admissions.hoshiarpur@birlaopenminds.com"
+
+def sanitize_for_tts(text):
+    """
+    Sanitizes Unicode characters (like em-dashes, curly quotes, non-ASCII symbols)
+    to clean ASCII to prevent Windows SAPI5 C++ engine crashes.
+    """
+    if not text:
+        return ""
+    text_str = str(text)
+    replacements = {
+        '—': ' - ',
+        '–': ' - ',
+        '’': "'",
+        '‘': "'",
+        '“': '"',
+        '”': '"',
+        '…': '...',
+        '•': '*',
+        '°': ' degrees',
+        '©': ' Copyright ',
+        '®': ' Registered ',
+        '™': ' Trademark ',
+        '⚡': '',
+        '🎤': '',
+        '🏫': '',
+        '🌐': '',
+        '▶': '',
+        '😄': '',
+        '🛑': ''
+    }
+    for orig, repl in replacements.items():
+        text_str = text_str.replace(orig, repl)
+    
+    clean_ascii = text_str.encode('ascii', 'ignore').decode('ascii')
+    return clean_ascii.strip()
 
 class JarvisCore:
     def __init__(self, log_callback=None, state_callback=None):
@@ -136,11 +171,15 @@ class JarvisCore:
         if not text or not str(text).strip():
             return
         
-        clean_text = str(text).strip()
+        raw_text = str(text).strip()
+        clean_text = sanitize_for_tts(raw_text)
+        if not clean_text:
+            return
+
         self.stop_speech_flag = False
         self.is_speaking = True
         self.set_state("SPEAKING")
-        self.log(clean_text, tag="JARVIS")
+        self.log(raw_text, tag="JARVIS")
 
         # Split text into individual sentences for fast sentence-by-sentence interrupt capability
         sentences = re.split(r'(?<=[.!?])\s+', clean_text)
@@ -357,7 +396,7 @@ class JarvisCore:
         speech = (
             f"It is our privilege at {self.company_name} to conduct this workshop at {self.school_name}. "
             f"Under the leadership of Director Sardar Kulwant Singh Kohar, BOMIS Hoshiarpur is dedicated to Nurturing India's Tomorrow. "
-            f"Guided by the 4 C's — Care, Cooperation, Collaboration, and Courtesy — the school fosters the joy of learning "
+            f"Guided by the 4 C's: Care, Cooperation, Collaboration, and Courtesy, the school fosters the joy of learning "
             f"and empowers students to excel in science, technology, arts, and leadership."
         )
         self.speak(speech)
@@ -441,7 +480,7 @@ class JarvisCore:
             elif any(phrase in command for phrase in [
                 "tell me about my school", "tell me about school", "about my school", 
                 "about school", "school info", "school information", "school details", 
-                "our school", "tell about school", "birla open minds", "bomis"
+                "our school", "tell about school", "birla open minds", "bomis", "birla open mind"
             ]):
                 self.present_school_info()
 
