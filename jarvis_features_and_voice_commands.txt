@@ -12,11 +12,19 @@ Event: Artificial Intelligence Workshop
 School Venue: Birla Open Minds International School (BOMIS), Hoshiarpur
 Director: S. Kulwant Singh Kohar
 Location: Village Lohar Kangana, P.O. Nainowal Jattan, Tanda Road, Hoshiarpur, Punjab
-
+Presenter / Trainer: Jatin
 Default Voice Security PIN: 1234
 ================================================================================
 
-1. O7 SERVICES COMPANY & AI WORKSHOP VOICE COMMANDS
+1. INSTANT SPEECH INTERRUPT (STOP SPEAKING IMMEDIATELY)
+--------------------------------------------------------------------------------
+• "stop" / "stop speaking" / "be quiet" / "shut up" / "silence" / "quiet" :
+   -> Instantly halts and silences JARVIS text-to-speech output mid-sentence.
+• Red "🛑 STOP" GUI Button :
+   -> Clickable red HUD button on screen to immediately quiet JARVIS at any time.
+
+
+2. O7 SERVICES COMPANY & AI WORKSHOP VOICE COMMANDS
 --------------------------------------------------------------------------------
 • "welcome workshop" / "start workshop" / "welcome presentation" : 
    -> Speaks a high-tech formal welcome speech to students, Director Sardar Kulwant Singh Kohar, 
@@ -43,7 +51,7 @@ Default Voice Security PIN: 1234
    -> Explains the purpose of the O7 Services AI Workshop at Birla Open Minds Hoshiarpur.
 
 
-2. BIRLA OPEN MINDS SCHOOL COMMANDS
+3. BIRLA OPEN MINDS SCHOOL COMMANDS
 --------------------------------------------------------------------------------
 • "tell me about my school" / "birla open minds" / "about school" :
    -> Speaks complete presentation of BOMIS Hoshiarpur: Nurturing India's Tomorrow, 
@@ -59,7 +67,7 @@ Default Voice Security PIN: 1234
    -> Opens official school website (birlaopenminds.com/k12/Punjab/hoshiarpur/) in browser.
 
 
-3. SYSTEM APPLICATIONS & WEB LAUNCHERS
+4. SYSTEM APPLICATIONS & WEB LAUNCHERS
 --------------------------------------------------------------------------------
 • "open google"         : Opens Google homepage in web browser.
 • "open youtube"        : Opens YouTube in web browser.
@@ -73,7 +81,7 @@ Default Voice Security PIN: 1234
 • "open task manager"   : Opens Windows Task Manager.
 
 
-4. SYSTEM TELEMETRY & PERFORMANCE MONITORING
+5. SYSTEM TELEMETRY & PERFORMANCE MONITORING
 --------------------------------------------------------------------------------
 • "time"                : Speaks the current local time.
 • "date"                : Speaks today's full date.
@@ -82,39 +90,39 @@ Default Voice Security PIN: 1234
 • "ram usage" / "memory": Speaks current RAM usage percentage.
 
 
-5. MASTER VOLUME CONTROLS
+6. MASTER VOLUME CONTROLS
 --------------------------------------------------------------------------------
 • "volume up"           : Sets system volume to 80%.
 • "volume down"         : Sets system volume to 30%.
 • "mute"                : Mutes system audio completely (0%).
 
 
-6. MUSIC PLAYBACK & YOUTUBE SEARCH
+7. MUSIC PLAYBACK & YOUTUBE SEARCH
 --------------------------------------------------------------------------------
 • "play <song name>"    : Plays specific song from preset library OR 
                           automatically searches and plays top YouTube result.
                           Examples: "play tu jdo ana", "play arjun", "play Believer"
 
 
-7. NEWS & HEADLINES
+8. NEWS & HEADLINES
 --------------------------------------------------------------------------------
 • "news"                : Reads out today's top 5 news headlines 
                           (Uses free Google News RSS feed, no API key needed).
 
 
-8. ENTERTAINMENT & HUMOR
+9. ENTERTAINMENT & HUMOR
 --------------------------------------------------------------------------------
 • "joke" / "tell joke"  : Reads a random tech/neutral joke.
 
 
-9. SYSTEM POWER MANAGEMENT (SECURITY PIN PROTECTED)
+10. SYSTEM POWER MANAGEMENT (SECURITY PIN PROTECTED)
 --------------------------------------------------------------------------------
 • "shutdown"            : Asks for Security PIN (1234), then shuts down system.
 • "restart"             : Asks for Security PIN (1234), then restarts system.
 • "sleep"               : Asks for Security PIN (1234), then puts system to sleep.
 
 
-10. FILE & FOLDER OPERATIONS
+11. FILE & FOLDER OPERATIONS
 --------------------------------------------------------------------------------
 • "open desktop"        : Opens Desktop directory in File Explorer.
 • "open documents"      : Opens Documents directory in File Explorer.
@@ -128,7 +136,7 @@ Default Voice Security PIN: 1234
                           moves file safely to Recycle Bin.
 
 
-11. FREE AI KNOWLEDGE BASE & WEB SEARCH (NO OPENAI KEY NEEDED)
+12. FREE AI KNOWLEDGE BASE & WEB SEARCH (NO OPENAI KEY NEEDED)
 --------------------------------------------------------------------------------
 • "who is <person>"     : Searches Wikipedia/DuckDuckGo, speaks concise bio.
 • "what is <topic>"     : Searches Wikipedia/DuckDuckGo, speaks concise definition.
@@ -138,7 +146,7 @@ Default Voice Security PIN: 1234
                           found, automatically launches Google search.
 
 
-12. ASSISTANT CONTROL & REPETITION
+13. ASSISTANT CONTROL & REPETITION
 --------------------------------------------------------------------------------
 • "repeat"              : Repeats the last executed voice command.
 • "who are you"         : Speaks JARVIS identity response (O7 Services AI Assistant).
@@ -147,14 +155,14 @@ Default Voice Security PIN: 1234
 • "exit jarvis" / "exit": Safely shuts down JARVIS interface.
 
 
-13. FUTURISTIC ARC REACTOR GUI FEATURES
+14. FUTURISTIC ARC REACTOR GUI FEATURES
 --------------------------------------------------------------------------------
 • Header Title: "⚡ J.A.R.V.I.S // O7 SERVICES AI WORKSHOP"
 • Vector-painted animated Ironman Arc Reactor Core with rotating tech rings.
 • Dynamic state color shifts (Cyan = Standby, Green = Listening, Gold = Processing, Red = PIN Check).
 • Animated Sound Waveform Equalizer.
 • Organization & Venue Telemetry Cards: O7 Services & BOMIS Hoshiarpur.
-• Quick Action Buttons including "🏫 SCHOOL DEMO".
+• Quick Action Buttons including "🎤 VOICE ACTIVATE", "🛑 STOP", and "🏫 SCHOOL DEMO".
 • Dual Input: Voice Activate button + Text command bar with Send button.
 
 ================================================================================

@@ -467,6 +467,10 @@ class JarvisMainWindow(QMainWindow):
         btn_voice.setStyleSheet(f"background-color: {COLOR_CYAN_STR}; color: #020617; font-weight: bold;")
         btn_voice.clicked.connect(self.on_click_voice_activate)
 
+        btn_stop = QPushButton("🛑 STOP")
+        btn_stop.setStyleSheet(f"background-color: {COLOR_RED_STR}; color: #ffffff; font-weight: bold;")
+        btn_stop.clicked.connect(self.on_click_stop_speaking)
+
         btn_school = QPushButton("🏫 SCHOOL DEMO")
         btn_school.setStyleSheet(f"background-color: {COLOR_GREEN_STR}; color: #020617; font-weight: bold;")
         btn_school.clicked.connect(lambda: self.on_quick_command("welcome presentation"))
@@ -481,6 +485,7 @@ class JarvisMainWindow(QMainWindow):
         btn_joke.clicked.connect(lambda: self.on_quick_command("tell me a joke"))
 
         quick_btns_layout.addWidget(btn_voice)
+        quick_btns_layout.addWidget(btn_stop)
         quick_btns_layout.addWidget(btn_school)
         quick_btns_layout.addWidget(btn_google)
         quick_btns_layout.addWidget(btn_yt)
@@ -604,6 +609,10 @@ class JarvisMainWindow(QMainWindow):
         self.listen_thread = VoiceListenThread(self.jarvis)
         self.listen_thread.signal_recognized.connect(self.on_voice_recognized)
         self.listen_thread.start()
+
+    def on_click_stop_speaking(self):
+        self.jarvis.stop_speaking()
+        self.gui_log_callback("Speech stopped immediately by user.", tag="SYSTEM")
 
     def on_voice_recognized(self, text):
         if text:

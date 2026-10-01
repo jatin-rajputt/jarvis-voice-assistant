@@ -3,7 +3,7 @@ Jarvis Core Assistant Module.
 Encapsulates voice recognition, text-to-speech, system automation,
 file management, PIN verification, AI Workshop presentation mode, and command processing.
 Customized for O7 Services AI Workshop at Birla Open Minds International School (BOMIS), Hoshiarpur.
-Fully fail-safe against all speech, network, and browser exceptions.
+Features sentence-level interruptible speech engine (Instant Stop Speaking on demand).
 """
 
 import os
@@ -24,6 +24,7 @@ from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 from dotenv import load_dotenv
 import xml.etree.ElementTree as ET
 import urllib.parse
+import re
 
 import musicLibrary
 from client import ask_ai
@@ -83,6 +84,11 @@ class JarvisCore:
         self.state_callback = state_callback
         self.news_api_key = os.getenv("NEWS_API_KEY")
         
+        # Speech State & Interruption Control
+        self.stop_speech_flag = False
+        self.is_speaking = False
+        self.current_tts_engine = None
+
         # Speech Recognizer Tuning
         self.recognizer = sr.Recognizer()
         self.recognizer.dynamic_energy_threshold = True
@@ -114,14 +120,32 @@ class JarvisCore:
             except Exception:
                 pass
 
+    def stop_speaking(self):
+        """Interrupts and halts current text-to-speech output immediately."""
+        self.stop_speech_flag = True
+        try:
+            if self.current_tts_engine:
+                self.current_tts_engine.stop()
+        except Exception as e:
+            print(f"[Stop Speaking Error] {e}")
+        self.is_speaking = False
+        self.set_state("IDLE")
+
     def speak(self, text):
-        """Thread-safe and fail-safe text-to-speech execution using pyttsx3."""
+        """Thread-safe and sentence-level interruptible text-to-speech execution."""
         if not text or not str(text).strip():
             return
         
         clean_text = str(text).strip()
+        self.stop_speech_flag = False
+        self.is_speaking = True
         self.set_state("SPEAKING")
         self.log(clean_text, tag="JARVIS")
+
+        # Split text into individual sentences for fast sentence-by-sentence interrupt capability
+        sentences = re.split(r'(?<=[.!?])\s+', clean_text)
+        if not sentences:
+            sentences = [clean_text]
 
         try:
             import pythoncom
@@ -135,12 +159,22 @@ class JarvisCore:
             voices = engine.getProperty("voices")
             if voices:
                 engine.setProperty("voice", voices[0].id)
-            engine.say(clean_text)
-            engine.runAndWait()
+            
+            self.current_tts_engine = engine
+
+            for sentence in sentences:
+                if self.stop_speech_flag:
+                    break
+                if sentence and sentence.strip():
+                    engine.say(sentence.strip())
+                    engine.runAndWait()
+            
             engine.stop()
         except Exception as e:
-            print(f"[TTS Error Suppressed] {e}")
+            print(f"[TTS Exception Suppressed] {e}")
         finally:
+            self.current_tts_engine = None
+            self.is_speaking = False
             self.set_state("IDLE")
 
     def listen_speech(self, timeout=5, phrase_time_limit=4):
@@ -230,6 +264,8 @@ class JarvisCore:
                 if "data" in res and res["data"]:
                     self.speak("Here are the top headlines.")
                     for article in res["data"][:5]:
+                        if self.stop_speech_flag:
+                            break
                         title = article.get("title", "")
                         if title:
                             self.speak(title)
@@ -246,6 +282,8 @@ class JarvisCore:
                 if items:
                     self.speak("Here are today's top headlines from Google News.")
                     for item in items[:5]:
+                        if self.stop_speech_flag:
+                            break
                         title = item.find("title").text
                         if title:
                             clean_title = title.split(" - ")[0]
@@ -352,8 +390,14 @@ class JarvisCore:
             self.last_command = raw_str
 
         try:
+            # ================= INSTANT SPEECH INTERRUPT COMMAND =================
+            if command in ["stop", "stop speaking", "shut up", "be quiet", "silence", "stop talking", "quiet", "hush"] or command == "stop":
+                self.stop_speaking()
+                self.log("Speech stopped immediately by user command", tag="SYSTEM")
+                return "STOPPED"
+
             # ================= O7 SERVICES WORKSHOP COMMANDS =================
-            if any(phrase in command for phrase in [
+            elif any(phrase in command for phrase in [
                 "welcome workshop", "start workshop", "ai workshop", "welcome presentation", 
                 "welcome judges", "project presentation", "welcome students", "welcome teachers"
             ]):
