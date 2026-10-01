@@ -123,6 +123,7 @@ class JarvisCore:
         self.stop_speech_flag = False
         self.is_speaking = False
         self.current_tts_engine = None
+        self.sapi_speaker = None
 
         # Speech Recognizer Tuning
         self.recognizer = sr.Recognizer()
@@ -159,15 +160,23 @@ class JarvisCore:
         """Interrupts and halts current text-to-speech output immediately."""
         self.stop_speech_flag = True
         try:
+            if hasattr(self, 'sapi_speaker') and self.sapi_speaker:
+                # SVSFPurgeBeforeSpeak = 2 (purges all queued speech immediately)
+                self.sapi_speaker.Speak("", 2)
+        except Exception as e:
+            print(f"[Stop SAPI Error] {e}")
+
+        try:
             if self.current_tts_engine:
                 self.current_tts_engine.stop()
         except Exception as e:
-            print(f"[Stop Speaking Error] {e}")
+            print(f"[Stop pyttsx3 Error] {e}")
+
         self.is_speaking = False
         self.set_state("IDLE")
 
     def speak(self, text):
-        """Thread-safe and sentence-level interruptible text-to-speech execution."""
+        """Thread-safe and sentence-level interruptible text-to-speech execution using Windows SAPI5."""
         if not text or not str(text).strip():
             return
         
@@ -181,35 +190,50 @@ class JarvisCore:
         self.set_state("SPEAKING")
         self.log(raw_text, tag="JARVIS")
 
-        # Split text into individual sentences for fast sentence-by-sentence interrupt capability
-        sentences = re.split(r'(?<=[.!?])\s+', clean_text)
-        if not sentences:
-            sentences = [clean_text]
-
         try:
             import pythoncom
+            import win32com.client
             pythoncom.CoInitialize()
-        except Exception:
-            pass
-
-        try:
-            engine = pyttsx3.init("sapi5")
-            engine.setProperty("rate", 160)
-            voices = engine.getProperty("voices")
-            if voices:
-                engine.setProperty("voice", voices[0].id)
             
-            self.current_tts_engine = engine
-
-            if not self.stop_speech_flag:
-                engine.say(clean_text)
-                engine.runAndWait()
+            speaker = win32com.client.Dispatch("SAPI.SpVoice")
+            self.sapi_speaker = speaker
             
-            engine.stop()
-        except Exception as e:
-            print(f"[TTS Exception Suppressed] {e}")
+            # SVSFlagsAsync = 1 (Async speech execution)
+            speaker.Speak(clean_text, 1)
+            
+            # Wait for speech to complete or until stop_speech_flag is set
+            while not self.stop_speech_flag:
+                # RunningState == 2 means currently speaking in SAPI5
+                if speaker.Status.RunningState != 2:
+                    break
+                time.sleep(0.05)
+                
+            if self.stop_speech_flag:
+                # Purge remaining speech instantly
+                speaker.Speak("", 2)
+                
+        except Exception as win_err:
+            print(f"[SAPI5 Exception, falling back to pyttsx3] {win_err}")
+            try:
+                engine = pyttsx3.init("sapi5")
+                engine.setProperty("rate", 160)
+                voices = engine.getProperty("voices")
+                if voices:
+                    engine.setProperty("voice", voices[0].id)
+                
+                self.current_tts_engine = engine
+
+                if not self.stop_speech_flag:
+                    engine.say(clean_text)
+                    engine.runAndWait()
+                
+                engine.stop()
+            except Exception as pyttsx_err:
+                print(f"[pyttsx3 Exception Suppressed] {pyttsx_err}")
+            finally:
+                self.current_tts_engine = None
         finally:
-            self.current_tts_engine = None
+            self.sapi_speaker = None
             self.is_speaking = False
             self.set_state("IDLE")
 
