@@ -203,10 +203,8 @@ class JarvisCore:
             
             # Wait for speech to complete or until stop_speech_flag is set
             while not self.stop_speech_flag:
-                # RunningState == 2 means currently speaking in SAPI5
-                if speaker.Status.RunningState != 2:
+                if speaker.WaitUntilDone(50):
                     break
-                time.sleep(0.05)
                 
             if self.stop_speech_flag:
                 # Purge remaining speech instantly
